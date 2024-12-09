@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .team-details {
+            margin-top: 20px;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007BFF;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Team Details</h1>
+    <div id="team-details" class="team-details"></div>
+    <a href="nbafinal.html">Go back to the teams list</a>
+
+    <script>
+        // Get the team ID from the URL parameters
+        const params = new URLSearchParams(window.location.search);
+        const teamId = params.get("id");
+
+        // Fetch team details if the ID exists
+        // Fetch team details if the ID exists
+if (teamId) {
+    fetch(`http://157.230.214.215/api/ben_nba/${teamId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Failed to fetch team details: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(team => {
+            const teamDetails = document.getElementById("team-details");
+
+            // Check if the team data contains the required fields
+            if (team.error || !team["team name"]) {
+                teamDetails.innerHTML = "<p class='error-message'>Team not found.</p>";
+                return;
+            }
+
+            // Populate team details
+            teamDetails.innerHTML = `
+                <p><strong>Team Name:</strong> ${team["team name"]}</p>
+                <p><strong>Location:</strong> ${team.location}</p>
+                <p><strong>Titles:</strong> ${team.titles}</p>
+                <p><strong>Coach:</strong> ${team.coach ? team.coach : "Not available"}</p>
+            `;
+        })
+        .catch(error => {
+            console.error("Error fetching team details:", error);
+            const teamDetails = document.getElementById("team-details");
+            teamDetails.innerHTML = "<p class='error-message'>Unable to load team details. Please try again later.</p>";
+        });
+} else {
+    const teamDetails = document.getElementById("team-details");
+    teamDetails.innerHTML = "<p class='error-message'>Invalid team ID.</p>";
+}
+    </script>
+</body>
+</html>
